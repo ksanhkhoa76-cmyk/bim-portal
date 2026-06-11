@@ -22,6 +22,9 @@
 
 const LINK_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTmIdgavLyCkeO1yUx5CvRdkYLH7cCW8tYlJ1QaSbKSpalHUP9pIexdo1dbiC5skg5d4_4L6pCd4lr/pub?gid=0&single=true&output=csv";
 
+/* Link MỞ BẢNG TÍNH để thêm/sửa/xóa dự án (nút ✎ trên web) */
+const LINK_SHEETS_EDIT = "https://docs.google.com/spreadsheets/d/1yDsIQZ5OzL0bmmhQztlQAHijPQG2TFePcUfig8QXiBw/edit";
+
 const TEN_DON_VI = "Phòng BIM — KC1";
 
 /* ★★★ HẾT PHẦN CẤU HÌNH — phía dưới không cần đụng tới ★★★
@@ -55,9 +58,11 @@ const TEN_DON_VI = "Phòng BIM — KC1";
     font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;
     text-transform:uppercase;letter-spacing:.06em;
     border:2px solid var(--ink);background:var(--white);padding:7px 16px;
-    transition:background .15s,color .15s;
+    transition:background .15s,color .15s;text-decoration:none;display:inline-block;color:var(--ink);
   }
   .btn-refresh:hover{background:var(--ink);color:var(--white)}
+  .btn-edit{border-color:var(--orange);color:var(--orange);margin-right:8px}
+  .btn-edit:hover{background:var(--orange);color:var(--white)}
 
   /* ===== Dải số liệu tổng hợp ===== */
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-top:2px solid var(--ink)}
@@ -121,6 +126,11 @@ const TEN_DON_VI = "Phòng BIM — KC1";
     text-transform:uppercase;letter-spacing:.06em;transition:background .15s,color .15s;
   }
   .card-foot a:hover{background:var(--ink);color:var(--white)}
+  .card-foot .no-link{
+    flex:1;text-align:center;padding:11px;
+    font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:15px;
+    text-transform:uppercase;letter-spacing:.06em;color:var(--line);
+  }
 
   /* ===== Trạng thái tải / lỗi / hướng dẫn ===== */
   .notice{
@@ -168,6 +178,7 @@ const TEN_DON_VI = "Phòng BIM — KC1";
     </div>
     <div class="hd-sync">
       <span class="time" id="lanDongBo">Chưa đồng bộ</span>
+      <a class="btn-refresh btn-edit" id="nutSua" href="#" target="_blank" rel="noopener">✎ Chỉnh sửa dữ liệu</a>
       <button class="btn-refresh" id="nutLamMoi" type="button">⟳ Cập nhật dữ liệu</button>
     </div>
   </div>
@@ -233,10 +244,16 @@ function lopBadge(loai){
 }
 function lopTrangThai(tt){
   const k = boDau(tt);
-  if(k.includes('hoan thanh') || k.includes('ban giao')) return 'tt-xong';
+  if(k.includes('hoan thanh') || k.includes('hoan thien') || k.includes('ban giao')) return 'tt-xong';
   if(k.includes('tam dung') || k.includes('tam ngung') || k.includes('ngung') || k.includes('treo') || k.includes('huy')) return 'tt-dung';
   if(k.includes('dang')) return 'tt-chay';
   return 'tt-khac';
+}
+/* Gắn link mở Sheets vào nút ✎ */
+if(typeof LINK_SHEETS_EDIT !== 'undefined' && LINK_SHEETS_EDIT){
+  $('nutSua').href = LINK_SHEETS_EDIT;
+} else {
+  $('nutSua').style.display = 'none';
 }
 /* Đọc ngày dd/mm/yyyy → Date */
 function docNgay(s){
@@ -409,7 +426,9 @@ function veDanhSach(){
         <div class="prog-scale"><span>0</span><span>50</span><span>100</span></div>
       </div>
       <div class="card-foot">
-        <a href="${thoatHTML(d.link)}" target="_blank" rel="noopener">Mở portal dự án →</a>
+        ${(d.link && d.link !== '#' && d.link !== '-')
+          ? `<a href="${thoatHTML(d.link)}" target="_blank" rel="noopener">Mở portal dự án →</a>`
+          : `<span class="no-link">Chưa có portal</span>`}
       </div>
     </article>`;
   }).join('');
