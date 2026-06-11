@@ -174,10 +174,10 @@ const TEN_DON_VI = "Phòng BIM — KC1";
 
   <div class="stats" id="daiSoLieu" hidden>
     <div class="stat"><span class="lbl">Tổng dự án</span><span class="num" id="stTong">—</span></div>
-    <div class="stat"><span class="lbl">Đang thiết kế</span><span class="num" id="stThietKe">—</span></div>
-    <div class="stat"><span class="lbl">Đang thi công</span><span class="num" id="stThiCong">—</span></div>
+    <div class="stat"><span class="lbl">Đang triển khai</span><span class="num" id="stTrienKhai">—</span></div>
+    <div class="stat"><span class="lbl">Đang tạm ngưng</span><span class="num" id="stTamNgung">—</span></div>
     <div class="stat"><span class="lbl">Tiến độ trung bình</span><span class="num" id="stTienDo">—</span></div>
-    <div class="stat"><span class="lbl">Sắp đến hạn (≤30 ngày)</span><span class="num warn" id="stSapHan">—</span></div>
+    <div class="stat"><span class="lbl">Sắp đến hạn (≤15 ngày)</span><span class="num warn" id="stSapHan">—</span></div>
   </div>
 
   <div class="toolbar" id="thanhCongCu" hidden>
@@ -234,7 +234,7 @@ function lopBadge(loai){
 function lopTrangThai(tt){
   const k = boDau(tt);
   if(k.includes('hoan thanh') || k.includes('ban giao')) return 'tt-xong';
-  if(k.includes('tam dung') || k.includes('treo') || k.includes('huy')) return 'tt-dung';
+  if(k.includes('tam dung') || k.includes('tam ngung') || k.includes('ngung') || k.includes('treo') || k.includes('huy')) return 'tt-dung';
   if(k.includes('dang')) return 'tt-chay';
   return 'tt-khac';
 }
@@ -340,14 +340,13 @@ function dungBoLoc(){
 /* --- Số liệu tổng hợp --- */
 function capNhatSoLieu(ds){
   $('stTong').textContent = ds.length;
-  const thiCong = ds.filter(d => boDau(d.giaidoan).includes('thi cong')).length;
-  $('stThiCong').textContent = thiCong;
-  $('stThietKe').textContent = ds.length - thiCong;
+  $('stTrienKhai').textContent = ds.filter(d => lopTrangThai(d.trangthai) === 'tt-chay').length;
+  $('stTamNgung').textContent = ds.filter(d => lopTrangThai(d.trangthai) === 'tt-dung').length;
   const tb = ds.length ? Math.round(ds.reduce((s,d)=>s+d.tiendo,0)/ds.length) : 0;
   $('stTienDo').textContent = tb + '%';
   $('stSapHan').textContent = ds.filter(d=>{
     const n = soNgayConLai(docNgay(d.hannop));
-    return n !== null && n <= 30;
+    return n !== null && n <= 15;
   }).length;
 }
 
@@ -382,7 +381,7 @@ function veDanhSach(){
     let hanHTML = '';
     if(conLai !== null){
       if(conLai < 0)        hanHTML = `<div class="deadline qua-han">▲ QUÁ HẠN ${-conLai} ngày (${thoatHTML(d.hannop)})</div>`;
-      else if(conLai <= 30) hanHTML = `<div class="deadline sap-han">● Còn ${conLai} ngày — hạn ${thoatHTML(d.hannop)}</div>`;
+      else if(conLai <= 15) hanHTML = `<div class="deadline sap-han">● Còn ${conLai} ngày — hạn ${thoatHTML(d.hannop)}</div>`;
       else                  hanHTML = `<div class="deadline con-han">○ Hạn nộp: ${thoatHTML(d.hannop)} (còn ${conLai} ngày)</div>`;
     } else if(d.hannop){
       hanHTML = `<div class="deadline">Hạn nộp: ${thoatHTML(d.hannop)}</div>`;
