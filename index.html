@@ -25,6 +25,10 @@ const LINK_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTmIdgavLyCke
 /* Link MỞ BẢNG TÍNH để thêm/sửa/xóa dự án (nút ✎ trên web) */
 const LINK_SHEETS_EDIT = "https://docs.google.com/spreadsheets/d/1yDsIQZ5OzL0bmmhQztlQAHijPQG2TFePcUfig8QXiBw/edit";
 
+/* Link APPS SCRIPT để thêm dữ liệu trực tiếp từ web (nút ➕)
+   Lấy theo hướng dẫn trong file ma-apps-script.txt */
+const LINK_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxRMxrdfCloNw22oz2BxAJFyg6p92sakVOta7A3cxnBH-mk0eTyhTAp9s--vu7qYNjlIA/exec";
+
 const TEN_DON_VI = "Phòng BIM — KC1";
 
 /* ★★★ HẾT PHẦN CẤU HÌNH — phía dưới không cần đụng tới ★★★
@@ -61,8 +65,59 @@ const TEN_DON_VI = "Phòng BIM — KC1";
     transition:background .15s,color .15s;text-decoration:none;display:inline-block;color:var(--ink);
   }
   .btn-refresh:hover{background:var(--ink);color:var(--white)}
-  .btn-edit{border-color:var(--orange);color:var(--orange);margin-right:8px}
-  .btn-edit:hover{background:var(--orange);color:var(--white)}
+  .btn-add{background:var(--ink);color:var(--white);margin-right:8px}
+  .btn-add:hover{background:var(--orange);border-color:var(--orange)}
+  .card-edit{
+    border:1px solid var(--line);background:var(--white);color:var(--concrete);
+    font-size:13px;line-height:1;padding:4px 8px;border-radius:2px;
+    transition:all .15s;
+  }
+  .card-edit:hover{border-color:var(--orange);color:var(--orange)}
+
+  /* ===== Hộp thoại form ===== */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(20,33,61,.55);z-index:100;
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:40px 16px;overflow-y:auto;
+  }
+  .modal{
+    background:var(--white);border:2px solid var(--ink);
+    width:100%;max-width:620px;
+  }
+  .modal-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 22px;border-bottom:2px solid var(--ink);
+  }
+  .modal-head h3{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:22px;text-transform:uppercase}
+  .modal-close{border:none;background:none;font-size:22px;line-height:1;color:var(--concrete);padding:4px 8px}
+  .modal-close:hover{color:var(--ink)}
+  .modal-body{padding:20px 22px;display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+  .f-full{grid-column:1 / -1}
+  .f-group label{
+    display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--concrete);margin-bottom:4px;
+  }
+  .f-group label .req{color:var(--orange)}
+  .f-group input,.f-group select,.f-group textarea{
+    width:100%;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;
+    padding:9px 12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);
+  }
+  .f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-color:var(--ink)}
+  .modal-foot{
+    padding:16px 22px;border-top:1px solid var(--line);
+    display:flex;justify-content:flex-end;gap:10px;align-items:center;
+  }
+  .modal-msg{margin-right:auto;font-size:13px;font-family:'IBM Plex Mono',monospace}
+  .modal-msg.ok{color:var(--green)}
+  .modal-msg.err{color:var(--red)}
+  .btn-submit{
+    font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:15px;
+    text-transform:uppercase;letter-spacing:.06em;
+    border:2px solid var(--orange);background:var(--orange);color:var(--white);padding:9px 22px;
+  }
+  .btn-submit:hover{background:var(--white);color:var(--orange)}
+  .btn-submit:disabled{opacity:.5;cursor:wait}
+  @media (max-width:560px){.modal-body{grid-template-columns:1fr}}
 
   /* ===== Dải số liệu tổng hợp ===== */
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-top:2px solid var(--ink)}
@@ -178,7 +233,8 @@ const TEN_DON_VI = "Phòng BIM — KC1";
     </div>
     <div class="hd-sync">
       <span class="time" id="lanDongBo">Chưa đồng bộ</span>
-      <a class="btn-refresh btn-edit" id="nutSua" href="#" target="_blank" rel="noopener">✎ Chỉnh sửa dữ liệu</a>
+      <button class="btn-refresh btn-add" id="nutThemDuAn" type="button">➕ Thêm dự án</button>
+      <button class="btn-refresh btn-add" id="nutThemViec" type="button">🗒 Khai báo công việc</button>
       <button class="btn-refresh" id="nutLamMoi" type="button">⟳ Cập nhật dữ liệu</button>
     </div>
   </div>
@@ -211,6 +267,78 @@ const TEN_DON_VI = "Phòng BIM — KC1";
 
 <main class="grid" id="luoiDuAn"></main>
 <p class="empty" id="thongBaoTrong" hidden>— Không tìm thấy dự án phù hợp —</p>
+
+<!-- ===== Hộp thoại: Thêm dự án ===== -->
+<div class="modal-overlay" id="modalDuAn" hidden>
+  <div class="modal" role="dialog" aria-labelledby="tieuDeFormDA">
+    <div class="modal-head">
+      <h3 id="tieuDeFormDA">➕ Thêm dự án mới</h3>
+      <button class="modal-close" type="button" data-dong>✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="f-group"><label>Mã dự án <span class="req">*</span></label><input id="da-ma" placeholder="VD: 50_BIM_ABC-TKKT"></div>
+      <div class="f-group"><label>Loại</label>
+        <input id="da-loai" list="dsLoai" placeholder="Chọn hoặc gõ mới">
+        <datalist id="dsLoai"><option>Cầu đường bộ</option><option>Kiến trúc</option><option>Nhà ở</option><option>Hạ tầng kỹ thuật</option></datalist>
+      </div>
+      <div class="f-group f-full"><label>Tên dự án <span class="req">*</span></label><input id="da-ten" placeholder="Tên đầy đủ của dự án"></div>
+      <div class="f-group"><label>Giai đoạn dự án</label>
+        <input id="da-giaidoan" list="dsGiaiDoan" placeholder="Chọn hoặc gõ mới">
+        <datalist id="dsGiaiDoan"><option>NCKT</option><option>BCNCKT</option><option>TKCS</option><option>TKKT</option><option>TKBVTC</option><option>QLTC</option></datalist>
+      </div>
+      <div class="f-group"><label>Vai trò</label>
+        <input id="da-vaitro" list="dsVaiTro" placeholder="Chọn hoặc gõ mới">
+        <datalist id="dsVaiTro"><option>TƯ VẤN BIM</option><option>TƯ VẤN GIÁM SÁT BIM</option><option>THẦU PHỤ QUẢN LÝ BIM</option></datalist>
+      </div>
+      <div class="f-group"><label>Tiến độ (%)</label><input id="da-tiendo" type="number" min="0" max="100" value="0"></div>
+      <div class="f-group"><label>Phụ trách <span class="req">*</span></label><input id="da-phutrach" placeholder="Họ tên người phụ trách"></div>
+      <div class="f-group"><label>Trạng thái</label>
+        <select id="da-trangthai"><option>Đang triển khai</option><option>Tạm ngưng</option><option>Đã hoàn thiện</option></select>
+      </div>
+      <div class="f-group"><label>Hạn nộp (dd/mm/yyyy)</label><input id="da-hannop" placeholder="VD: 30/09/2026 hoặc để trống"></div>
+      <div class="f-group f-full"><label>Link portal / CDE</label><input id="da-link" placeholder="https://... hoặc để trống"></div>
+      <div class="f-group f-full"><label>Mã xác nhận của phòng <span class="req">*</span></label><input id="da-matkhau" type="password" placeholder="Hỏi BIM Manager nếu chưa có"></div>
+    </div>
+    <div class="modal-foot">
+      <span class="modal-msg" id="msgDuAn"></span>
+      <button class="btn-submit" id="guiDuAn" type="button">Ghi vào Sheets</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Hộp thoại: Khai báo công việc ===== -->
+<div class="modal-overlay" id="modalViec" hidden>
+  <div class="modal" role="dialog" aria-labelledby="tieuDeFormCV">
+    <div class="modal-head">
+      <h3 id="tieuDeFormCV">🗒 Khai báo công việc</h3>
+      <button class="modal-close" type="button" data-dong>✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="f-group f-full"><label>Thuộc dự án <span class="req">*</span></label>
+        <input id="cv-mada" list="dsMaDA" placeholder="Gõ để tìm mã dự án">
+        <datalist id="dsMaDA"></datalist>
+      </div>
+      <div class="f-group f-full"><label>Nội dung công việc <span class="req">*</span></label><input id="cv-nhiemvu" placeholder="VD: Dựng model cầu Km2+100, LOD 350"></div>
+      <div class="f-group"><label>Người thực hiện <span class="req">*</span></label>
+        <input id="cv-nguoi" list="dsNguoi" placeholder="Chọn hoặc gõ tên">
+        <datalist id="dsNguoi"></datalist>
+      </div>
+      <div class="f-group"><label>Ưu tiên</label>
+        <select id="cv-uutien"><option>Trung bình</option><option>Cao</option><option>Thấp</option></select>
+      </div>
+      <div class="f-group"><label>Hạn (dd/mm/yyyy)</label><input id="cv-han" placeholder="VD: 20/06/2026"></div>
+      <div class="f-group"><label>Trạng thái</label>
+        <select id="cv-trangthai"><option>Chưa bắt đầu</option><option>Đang làm</option><option>Chờ duyệt</option><option>Hoàn thành</option></select>
+      </div>
+      <div class="f-group f-full"><label>Ghi chú</label><input id="cv-ghichu" placeholder="Tùy chọn"></div>
+      <div class="f-group f-full"><label>Mã xác nhận của phòng <span class="req">*</span></label><input id="cv-matkhau" type="password" placeholder="Hỏi BIM Manager nếu chưa có"></div>
+    </div>
+    <div class="modal-foot">
+      <span class="modal-msg" id="msgViec"></span>
+      <button class="btn-submit" id="guiViec" type="button">Ghi vào Sheets</button>
+    </div>
+  </div>
+</div>
 
 <footer>
   <span id="footDonVi"></span>
@@ -248,12 +376,6 @@ function lopTrangThai(tt){
   if(k.includes('tam dung') || k.includes('tam ngung') || k.includes('ngung') || k.includes('treo') || k.includes('huy')) return 'tt-dung';
   if(k.includes('dang')) return 'tt-chay';
   return 'tt-khac';
-}
-/* Gắn link mở Sheets vào nút ✎ */
-if(typeof LINK_SHEETS_EDIT !== 'undefined' && LINK_SHEETS_EDIT){
-  $('nutSua').href = LINK_SHEETS_EDIT;
-} else {
-  $('nutSua').style.display = 'none';
 }
 /* Đọc ngày dd/mm/yyyy → Date */
 function docNgay(s){
@@ -407,7 +529,10 @@ function veDanhSach(){
     <article class="card">
       <div class="card-top">
         <span class="card-ma">${thoatHTML(d.ma)}</span>
-        <span class="badge ${lopBadge(d.loai)}">${thoatHTML(d.loai)}</span>
+        <span style="display:flex;gap:8px;align-items:center">
+          <span class="badge ${lopBadge(d.loai)}">${thoatHTML(d.loai)}</span>
+          <button class="card-edit" type="button" data-suama="${thoatHTML(d.ma)}" title="Chỉnh sửa dự án này">✎</button>
+        </span>
       </div>
       <h2>${thoatHTML(d.ten)}</h2>
       <div class="card-meta">
@@ -441,6 +566,129 @@ $('locGiaiDoan').addEventListener('change', veDanhSach);
 $('locTrangThai').addEventListener('change', veDanhSach);
 $('sapXep').addEventListener('change', veDanhSach);
 $('nutLamMoi').addEventListener('click', taiDuLieu);
+
+/* ====== Form thêm trực tiếp trên web ====== */
+const coAppsScript = typeof LINK_APPS_SCRIPT !== 'undefined'
+  && LINK_APPS_SCRIPT && !LINK_APPS_SCRIPT.includes('DÁN_LINK');
+
+function moModal(id){
+  if(!coAppsScript){
+    alert('Chức năng này cần cài Apps Script trước.\n\nMở file ma-apps-script.txt và làm theo hướng dẫn (~10 phút), sau đó dán link vào dòng LINK_APPS_SCRIPT trong file này.');
+    return;
+  }
+  /* Gợi ý sẵn mã dự án và tên người từ dữ liệu hiện có */
+  $('dsMaDA').innerHTML = [...new Set(DU_AN.map(d=>d.ma).filter(Boolean))]
+    .map(m=>`<option>${thoatHTML(m)}</option>`).join('');
+  $('dsNguoi').innerHTML = [...new Set(DU_AN.map(d=>d.phutrach).filter(Boolean))]
+    .map(n=>`<option>${thoatHTML(n)}</option>`).join('');
+  $(id).hidden = false;
+}
+let maDangSua = null;
+
+$('nutThemDuAn').addEventListener('click', ()=>{
+  maDangSua = null;
+  $('tieuDeFormDA').textContent = '➕ Thêm dự án mới';
+  $('guiDuAn').textContent = 'Ghi vào Sheets';
+  ['da-ma','da-ten','da-loai','da-giaidoan','da-vaitro','da-phutrach','da-hannop','da-link'].forEach(id=>$(id).value='');
+  $('da-tiendo').value = '0';
+  $('msgDuAn').textContent = '';
+  moModal('modalDuAn');
+});
+$('nutThemViec').addEventListener('click', ()=>moModal('modalViec'));
+
+/* Chế độ CHỈNH SỬA: bấm ✎ trên thẻ → mở form điền sẵn dữ liệu */
+$('luoiDuAn').addEventListener('click', e=>{
+  const nut = e.target.closest('.card-edit');
+  if(!nut) return;
+  const d = DU_AN.find(x => x.ma === nut.dataset.suama);
+  if(!d) return;
+  maDangSua = d.ma;
+  $('tieuDeFormDA').textContent = '✎ Chỉnh sửa: ' + d.ma;
+  $('guiDuAn').textContent = 'Lưu thay đổi';
+  $('da-ma').value = d.ma;
+  $('da-ten').value = d.ten;
+  $('da-loai').value = d.loai;
+  $('da-giaidoan').value = d.giaidoan;
+  $('da-vaitro').value = d.vaitro;
+  $('da-tiendo').value = d.tiendo;
+  $('da-phutrach').value = d.phutrach;
+  $('da-trangthai').value = d.trangthai || 'Đang triển khai';
+  $('da-hannop').value = d.hannop === '-' ? '' : d.hannop;
+  $('da-link').value = d.link === '-' || d.link === '#' ? '' : d.link;
+  $('msgDuAn').textContent = '';
+  moModal('modalDuAn');
+});
+
+document.querySelectorAll('[data-dong]').forEach(b=>{
+  b.addEventListener('click', e=>e.target.closest('.modal-overlay').hidden = true);
+});
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.hidden = true; });
+});
+
+async function guiLenSheets(type, data, matkhau, msgEl, nutEl){
+  msgEl.className = 'modal-msg'; msgEl.textContent = 'Đang ghi...';
+  nutEl.disabled = true;
+  try{
+    const res = await fetch(LINK_APPS_SCRIPT, {
+      method:'POST',
+      body: JSON.stringify({type, matkhau, data})
+    });
+    const kq = await res.json();
+    if(kq.ok){
+      msgEl.className = 'modal-msg ok';
+      msgEl.textContent = '✔ Đã ghi! Web sẽ hiện sau 1–5 phút (bấm ⟳).';
+      return true;
+    }
+    msgEl.className = 'modal-msg err';
+    msgEl.textContent = '✖ ' + (kq.loi || 'Lỗi không xác định');
+    return false;
+  }catch(err){
+    msgEl.className = 'modal-msg err';
+    msgEl.textContent = '✖ Không gửi được: ' + err.message;
+    return false;
+  }finally{
+    nutEl.disabled = false;
+  }
+}
+
+$('guiDuAn').addEventListener('click', async ()=>{
+  const v = id => $(id).value.trim();
+  const msg = $('msgDuAn');
+  if(!v('da-ma') || !v('da-ten') || !v('da-phutrach')){
+    msg.className='modal-msg err'; msg.textContent='✖ Điền đủ các ô có dấu *'; return;
+  }
+  if(!v('da-matkhau')){
+    msg.className='modal-msg err'; msg.textContent='✖ Nhập mã xác nhận của phòng'; return;
+  }
+  const ok = await guiLenSheets(maDangSua ? 'suaduan' : 'duan', {
+    magoc: maDangSua || '',
+    ma:v('da-ma'), ten:v('da-ten'), loai:v('da-loai'), giaidoan:v('da-giaidoan'),
+    vaitro:v('da-vaitro'), tiendo:v('da-tiendo')||'0', phutrach:v('da-phutrach'),
+    trangthai:v('da-trangthai'), hannop:v('da-hannop')||'-', link:v('da-link')||'-'
+  }, v('da-matkhau'), msg, $('guiDuAn'));
+  if(ok && !maDangSua){
+    ['da-ma','da-ten','da-giaidoan','da-tiendo','da-hannop','da-link'].forEach(id=>$(id).value = id==='da-tiendo'?'0':'');
+  }
+});
+
+$('guiViec').addEventListener('click', async ()=>{
+  const v = id => $(id).value.trim();
+  const msg = $('msgViec');
+  if(!v('cv-mada') || !v('cv-nhiemvu') || !v('cv-nguoi')){
+    msg.className='modal-msg err'; msg.textContent='✖ Điền đủ các ô có dấu *'; return;
+  }
+  if(!v('cv-matkhau')){
+    msg.className='modal-msg err'; msg.textContent='✖ Nhập mã xác nhận của phòng'; return;
+  }
+  const ok = await guiLenSheets('nhiemvu', {
+    mada:v('cv-mada'), nhiemvu:v('cv-nhiemvu'), nguoi:v('cv-nguoi'),
+    uutien:v('cv-uutien'), han:v('cv-han')||'-', trangthai:v('cv-trangthai'), ghichu:v('cv-ghichu')
+  }, v('cv-matkhau'), msg, $('guiViec'));
+  if(ok){
+    ['cv-nhiemvu','cv-han','cv-ghichu'].forEach(id=>$(id).value='');
+  }
+});
 
 /* Tự làm mới mỗi 5 phút */
 setInterval(taiDuLieu, 5*60*1000);
