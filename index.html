@@ -149,17 +149,27 @@ const DANH_SACH_NHAN_SU = [
   .ms-options input { width: auto; margin-right: 8px; cursor:pointer;}
 
   /* ===== BẢNG KANBAN (Kéo thả) ===== */
-  .modal-kanban{max-width:1100px;display:flex;flex-direction:column;max-height:88vh;}
-  .kanban-tools {padding: 0 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px dashed var(--line); padding-bottom: 12px;}
+  /* Đã giới hạn chiều cao modal là 90vh để không bao giờ bị vỡ footer xuống dưới */
+  .modal-kanban{max-width:1100px;display:flex;flex-direction:column;height:90vh;max-height:90vh;}
+  .kanban-tools {padding: 0 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px dashed var(--line); padding-bottom: 12px; flex-shrink:0;}
   .k-filter-lbl {font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--concrete); text-transform: uppercase; letter-spacing: 0.05em;}
   .k-chip {padding: 3px 10px; font-size: 11.5px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); color: var(--concrete); cursor: pointer; transition: 0.2s;}
   .k-chip:hover {border-color: var(--orange); color: var(--orange);}
   .k-chip.active {background: var(--orange); color: var(--white); border-color: var(--orange);}
   
-  .kanban-wrapper{display:flex;flex:1;gap:12px;padding:16px;padding-top:0; background:var(--paper);overflow-x:auto; -webkit-overflow-scrolling: touch; min-height:300px;}
-  .kanban-col{flex:1;min-width:260px;background:rgba(0,0,0,0.03);border:1px solid var(--line);border-radius:4px;display:flex;flex-direction:column;padding:10px;}
-  .k-head{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--ink);}
-  .k-list{flex:1;min-height:50px;} 
+  /* Cấu trúc wrapper không cuộn dọc, chỉ cho các cột con bên trong tự cuộn */
+  .kanban-wrapper{display:flex;flex:1;gap:12px;padding:16px;padding-top:0; background:var(--paper);overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling: touch; min-height:300px; align-items:stretch;}
+  .kanban-col{flex:1;min-width:260px;background:rgba(0,0,0,0.03);border:1px solid var(--line);border-radius:4px;display:flex;flex-direction:column;padding:10px; max-height:100%;}
+  .k-head{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--ink); flex-shrink:0;}
+  
+  /* CẤP THANH CUỘN ĐỘC LẬP CHO TỪNG CỘT TẠI ĐÂY */
+  .k-list{flex:1;min-height:50px; overflow-y:auto; overflow-x:hidden; padding-right:4px; padding-bottom:40px;} 
+  /* Làm đẹp thanh cuộn nhỏ cho các cột */
+  .k-list::-webkit-scrollbar { width: 5px; }
+  .k-list::-webkit-scrollbar-track { background: transparent; }
+  .k-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
+  .k-list::-webkit-scrollbar-thumb:hover { background: var(--concrete); }
+
   .k-card{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--ink);padding:12px;margin-bottom:10px;border-radius:2px;cursor:grab;box-shadow:0 1px 3px rgba(0,0,0,0.05);transition:transform .1s; touch-action: none; /* Cần thiết cho kéo thả trên điện thoại */}
   .k-card:active{cursor:grabbing;transform:scale(0.98);}
   .k-card.k-dragging{opacity:0.4;background:#f0f0f0;}
@@ -289,7 +299,7 @@ const DANH_SACH_NHAN_SU = [
 
 <div class="modal-overlay" id="modalKanban" hidden>
   <div class="modal modal-kanban" role="dialog">
-    <div class="modal-head" style="border-bottom:none; padding-bottom:10px;">
+    <div class="modal-head" style="border-bottom:none; padding-bottom:10px; flex-shrink:0;">
       <h3 id="kanbanTitle">Bảng công việc</h3>
       <button class="modal-close" type="button" data-dong>✕</button>
     </div>
@@ -316,7 +326,7 @@ const DANH_SACH_NHAN_SU = [
         <div class="k-list" ondragover="choPhepTha(event)" ondrop="thaThe(event, 'Hoàn thành')"></div>
       </div>
     </div>
-    <div class="modal-foot">
+    <div class="modal-foot" style="flex-shrink:0;">
       <span class="modal-msg" id="msgKanban" style="color:var(--concrete)">💡 Dùng chuột kéo thả thẻ để cập nhật trạng thái nhanh</span>
       <button class="btn-kanban" type="button" id="btnGiaoViecKanban">＋ Giao việc mới</button>
     </div>
@@ -425,7 +435,6 @@ function tinhTienDo(mada) {
   return Math.round((xong / viec.length) * 100);
 }
 
-/* ĐÃ SỬA CỰC KỲ CHI TIẾT ĐỂ BẮT MỌI LOẠI TÊN CỘT TRONG GOOGLE SHEETS */
 function chuanHoaViec(row){
   const o = {}; for(const k in row) o[boDau(k)] = String(row[k] ?? '').trim();
   return {
@@ -752,6 +761,9 @@ $('btnGiaoViecKanban').addEventListener('click', () => {
 function moModal(id){
   const coAppsScript = typeof LINK_APPS_SCRIPT !== 'undefined' && LINK_APPS_SCRIPT && !LINK_APPS_SCRIPT.includes('DÁN_LINK');
   if(!coAppsScript){ alert('Chức năng này cần cài Apps Script trước.'); return; }
+  
+  if($('dsMaDA')) $('dsMaDA').innerHTML = [...new Set(DU_AN.map(d=>d.ma).filter(Boolean))].map(m=>`<option>${m}</option>`).join('');
+  
   $(id).hidden = false;
 }
 
