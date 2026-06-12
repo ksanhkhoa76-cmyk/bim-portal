@@ -256,6 +256,68 @@ const TEN_DON_VI = "Phòng BIM — KC1";
     font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--concrete);
     letter-spacing:.06em;text-transform:uppercase;
   }
+
+  /* ===== Chế độ Dark Mode ===== */
+  [data-theme="dark"] {
+    --paper: #121212; 
+    --ink: #E0E0E0; 
+    --orange: #FF7043;
+    --concrete: #A0A0A0; 
+    --line: #333333; 
+    --white: #1E1E1E;
+    --red: #CF6679; 
+    --amber: #FFB300; 
+    --green: #81C784;
+  }
+  
+  /* Giao diện nút gạt (Toggle Switch) */
+  .theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .theme-switch {
+    display: inline-block;
+    height: 22px;
+    position: relative;
+    width: 44px;
+  }
+  .theme-switch input {
+    display: none;
+  }
+  .slider {
+    background-color: var(--line);
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 22px;
+  }
+  .slider:before {
+    background-color: var(--white);
+    bottom: 3px;
+    content: "";
+    height: 16px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 16px;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: var(--orange);
+  }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+  .theme-icon {
+    font-size: 14px;
+  }
 </style>
 </head>
 <body>
@@ -267,6 +329,14 @@ const TEN_DON_VI = "Phòng BIM — KC1";
       <h1>Trung tâm quản lý dự án</h1>
     </div>
     <div class="hd-sync">
+      <div class="theme-switch-wrapper">
+        <span class="theme-icon">☀️</span>
+        <label class="theme-switch" for="checkboxTheme" aria-label="Bật/tắt giao diện tối">
+          <input type="checkbox" id="checkboxTheme" />
+          <div class="slider round"></div>
+        </label>
+        <span class="theme-icon">🌙</span>
+      </div>
       <span class="time" id="lanDongBo">Chưa đồng bộ</span>
       <button class="btn-refresh btn-add" id="nutThemDuAn" type="button">➕ Thêm dự án</button>
       <button class="btn-refresh btn-add" id="nutThemViec" type="button">🗒 Khai báo công việc</button>
@@ -303,7 +373,6 @@ const TEN_DON_VI = "Phòng BIM — KC1";
 <main class="grid" id="luoiDuAn"></main>
 <p class="empty" id="thongBaoTrong" hidden>— Không tìm thấy dự án phù hợp —</p>
 
-<!-- ===== Hộp thoại: Thêm dự án ===== -->
 <div class="modal-overlay" id="modalDuAn" hidden>
   <div class="modal" role="dialog" aria-labelledby="tieuDeFormDA">
     <div class="modal-head">
@@ -342,7 +411,6 @@ const TEN_DON_VI = "Phòng BIM — KC1";
   </div>
 </div>
 
-<!-- ===== Hộp thoại: Khai báo công việc ===== -->
 <div class="modal-overlay" id="modalViec" hidden>
   <div class="modal" role="dialog" aria-labelledby="tieuDeFormCV">
     <div class="modal-head">
@@ -876,6 +944,32 @@ setInterval(()=>{
   if(Date.now() - lanGhiCuoi > 6*60*1000) taiDuLieu();
 }, 5*60*1000);
 taiDuLieu();
+
+/* ====== Chức năng Dark Mode ====== */
+const toggleSwitch = document.querySelector('#checkboxTheme');
+const currentTheme = localStorage.getItem('theme');
+
+// Kiểm tra xem lần trước người dùng đang dùng nền tối hay sáng
+if (currentTheme) {
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  if (currentTheme === 'dark') {
+    toggleSwitch.checked = true;
+  }
+}
+
+// Xử lý sự kiện khi bấm nút gạt
+function switchTheme(e) {
+  if (e.target.checked) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark'); // Lưu lựa chọn vào trình duyệt
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+  }
+}
+if(toggleSwitch){
+  toggleSwitch.addEventListener('change', switchTheme, false);
+}
 </script>
 
 </body>
