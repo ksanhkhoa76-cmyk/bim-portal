@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
 
 <script>
 /* ============================================================
@@ -93,7 +96,6 @@ const DANH_SACH_NHAN_SU = [
   .prog-dash{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 12px,rgba(255,255,255,.55) 12px 14px)}
   .prog-scale{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--concrete);margin-top:3px;letter-spacing:.05em;}
   
-  /* Nút bấm mở Kanban gọn gàng */
   .tasks-summary{border-top:1px dashed var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}
   .tasks-title{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;color:var(--concrete)}
   .btn-kanban{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--ink);background:var(--white);color:var(--ink);padding:4px 12px;border-radius:2px;transition:all .15s;}
@@ -128,6 +130,10 @@ const DANH_SACH_NHAN_SU = [
   .btn-del{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.06em;border:2px solid var(--red);background:var(--white);color:var(--red);padding:9px 16px;}
   .btn-del:hover{background:var(--red);color:var(--white)}
 
+  /* Giao diện Calendar Flatpickr (Ngày tháng) */
+  .flatpickr-today-btn { width: 100%; padding: 8px 0; background: var(--paper); border: none; border-top: 1px solid var(--line); color: var(--orange); font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+  .flatpickr-today-btn:hover { background: var(--line); }
+
   /* Tính năng Multi-select (Chọn nhiều nhân sự) */
   .ms-wrapper { position: relative; width: 100%; font-family: 'Be Vietnam Pro', sans-serif; font-size: 14px; }
   .ms-header { padding: 9px 12px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; display:flex; justify-content: space-between; align-items:center; }
@@ -139,9 +145,9 @@ const DANH_SACH_NHAN_SU = [
 
   /* ===== BẢNG KANBAN (Kéo thả) ===== */
   .modal-kanban{max-width:1100px;display:flex;flex-direction:column;max-height:88vh;}
-  .kanban-tools {padding: 0 16px; margin-bottom: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; border-bottom: 1px dashed var(--line); padding-bottom: 12px;}
+  .kanban-tools {padding: 0 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px dashed var(--line); padding-bottom: 12px;}
   .k-filter-lbl {font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--concrete); text-transform: uppercase; letter-spacing: 0.05em;}
-  .k-chip {padding: 3px 10px; font-size: 11px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); color: var(--concrete); cursor: pointer; transition: 0.2s;}
+  .k-chip {padding: 3px 10px; font-size: 11.5px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); color: var(--concrete); cursor: pointer; transition: 0.2s;}
   .k-chip:hover {border-color: var(--orange); color: var(--orange);}
   .k-chip.active {background: var(--orange); color: var(--white); border-color: var(--orange);}
   
@@ -198,6 +204,21 @@ const DANH_SACH_NHAN_SU = [
   [data-theme="dark"] .b-nutgiao {background: rgba(112, 26, 117, 0.15); color: #F0ABFC; border-color: rgba(217, 70, 239, 0.5);}
   [data-theme="dark"] .tt-khac {background: rgba(255,255,255,0.05); color: #A0A0A0; border-color: #555;}
   [data-theme="dark"] .k-badge {background: rgba(255,255,255,0.05); color: #A0A0A0;}
+
+  /* Flatpickr Dark Mode Overrides */
+  [data-theme="dark"] .flatpickr-calendar { background: #1E1E1E; border: 1px solid var(--line); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+  [data-theme="dark"] .flatpickr-day { color: #E0E0E0; }
+  [data-theme="dark"] .flatpickr-day:hover, [data-theme="dark"] .flatpickr-day:focus { background: #333333; border-color: #333333; }
+  [data-theme="dark"] .flatpickr-day.selected { background: #FF7043; border-color: #FF7043; color: #fff; }
+  [data-theme="dark"] .flatpickr-day.flatpickr-disabled, [data-theme="dark"] .flatpickr-day.flatpickr-disabled:hover { color: #555; }
+  [data-theme="dark"] .flatpickr-day.prevMonthDay, [data-theme="dark"] .flatpickr-day.nextMonthDay { color: #666; }
+  [data-theme="dark"] .flatpickr-month { fill: #E0E0E0; color: #E0E0E0; }
+  [data-theme="dark"] span.flatpickr-weekday { color: #A0A0A0; }
+  [data-theme="dark"] .flatpickr-current-month input.cur-year { color: #E0E0E0; }
+  [data-theme="dark"] .flatpickr-today-btn { background: #1E1E1E; border-color: #333333; color: #FF7043; }
+  [data-theme="dark"] .flatpickr-today-btn:hover { background: #333333; }
+  [data-theme="dark"] .flatpickr-calendar.arrowTop:before { border-bottom-color: var(--line); }
+  [data-theme="dark"] .flatpickr-calendar.arrowTop:after { border-bottom-color: #1E1E1E; }
 
   .theme-switch-wrapper{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:12px;}
   .theme-switch{display:inline-block;height:22px;position:relative;width:44px;}
@@ -269,8 +290,7 @@ const DANH_SACH_NHAN_SU = [
     </div>
     
     <div class="kanban-tools">
-      <span class="k-filter-lbl">Lọc nhanh:</span>
-      <div id="k-filters-container" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+      <div id="k-filters-container"></div>
     </div>
 
     <div class="kanban-wrapper">
@@ -314,6 +334,7 @@ const DANH_SACH_NHAN_SU = [
       <div class="f-group"><label>Vai trò</label><input id="da-vaitro"></div>
       <div class="f-group"><label>Trạng thái</label>
         <select id="da-trangthai"><option>Đang triển khai</option><option>Tạm ngưng</option><option>Đã hoàn thiện</option></select></div>
+      
       <div class="f-group f-full"><label>Phụ trách *</label>
         <div class="ms-wrapper" id="ms-phutrach-container"></div>
       </div>
@@ -340,6 +361,7 @@ const DANH_SACH_NHAN_SU = [
         <datalist id="dsMaDA"></datalist></div>
       <div class="f-group"><label>Hạng mục</label><input id="cv-hangmuc" placeholder="VD: Kiến trúc, Kết cấu, MEP..."></div>
       <div class="f-group f-full"><label>Nội dung công việc *</label><input id="cv-nhiemvu" placeholder="VD: Dựng model cầu Km2+100"></div>
+      
       <div class="f-group f-full"><label>Người thực hiện *</label>
         <div class="ms-wrapper" id="ms-nguoi-container"></div>
       </div>
@@ -375,7 +397,7 @@ let NHIEM_VU = [];
 let maXacNhanCache = ''; 
 let lanGhiCuoi = 0;
 let maDangSua = null; 
-let nhiemvuDangSua = null; // Cờ theo dõi đang Edit công việc
+let nhiemvuDangSua = null; 
 const $ = id => document.getElementById(id);
 
 document.title = TEN_DON_VI + ' — Quản lý dự án';
@@ -402,7 +424,7 @@ function chuanHoaViec(row){
   const o = {}; for(const k in row) o[boDau(k)] = String(row[k] ?? '').trim();
   return {
     mada: o['ma da'] || o['mada'] || '', 
-    hangmuc: o['hang muc'] || o['hangmuc'] || o['phan loai'] || '', /* Lấy hạng mục */
+    hangmuc: o['hang muc'] || o['hangmuc'] || o['phan loai'] || '',
     nhiemvu: o['nhiem vu'] || o['nhiemvu'] || '',
     nguoi: o['nguoi thuc hien'] || o['nguoi'] || '', 
     uutien: o['uu tien'] || o['uutien'] || '',
@@ -552,12 +574,10 @@ function veDanhSach(){
 /* ====== LOGIC BẢNG KANBAN TÍCH HỢP FILTER & EDIT ====== */
 let madaKanbanHienTai = null;
 let theDangKeo = null;
-let kanbanFilter = null; // Lưu bộ lọc hiện tại của Kanban
+let kFilter = { hangmuc: null, nguoi: null };
 
-function setKFilter(f) {
-  kanbanFilter = f;
-  veKanban();
-}
+function setKFilterHM(val) { kFilter.hangmuc = val; veKanban(); }
+function setKFilterNguoi(val) { kFilter.nguoi = val; veKanban(); }
 
 function veKanban() {
   if(!madaKanbanHienTai) return;
@@ -566,13 +586,25 @@ function veKanban() {
   /* Tạo danh sách bộ lọc: Lấy tất cả Hạng mục & Nhân sự */
   const dhm = [...new Set(viecAll.map(v => v.hangmuc).filter(Boolean))];
   const dng = [...new Set(viecAll.flatMap(v => v.nguoi.split(',').map(s=>s.trim())).filter(Boolean))];
-  const allFilters = [...dhm, ...dng];
 
-  let htmlFilters = `<button class="k-chip ${!kanbanFilter ? 'active' : ''}" onclick="setKFilter(null)">Tất cả</button>`;
-  allFilters.forEach(f => {
-    htmlFilters += `<button class="k-chip ${kanbanFilter === f ? 'active' : ''}" onclick="setKFilter('${f}')">${thoatHTML(f)}</button>`;
+  // Render HTML 2 hàng Lọc
+  let htmlHM = `<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
+    <span class="k-filter-lbl" style="width:70px">Hạng mục:</span>
+    <button class="k-chip ${!kFilter.hangmuc ? 'active' : ''}" onclick="setKFilterHM(null)">Tất cả</button>`;
+  dhm.forEach(f => {
+    htmlHM += `<button class="k-chip ${kFilter.hangmuc === f ? 'active' : ''}" onclick="setKFilterHM('${f.replace(/'/g, "\\'")}')">${thoatHTML(f)}</button>`;
   });
-  $('k-filters-container').innerHTML = htmlFilters;
+  htmlHM += `</div>`;
+
+  let htmlNg = `<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+    <span class="k-filter-lbl" style="width:70px">Nhân sự:</span>
+    <button class="k-chip ${!kFilter.nguoi ? 'active' : ''}" onclick="setKFilterNguoi(null)">Tất cả</button>`;
+  dng.forEach(f => {
+    htmlNg += `<button class="k-chip ${kFilter.nguoi === f ? 'active' : ''}" onclick="setKFilterNguoi('${f.replace(/'/g, "\\'")}')">${thoatHTML(f)}</button>`;
+  });
+  htmlNg += `</div>`;
+
+  $('k-filters-container').innerHTML = htmlHM + htmlNg;
 
   const cols = { 'Chưa bắt đầu':[], 'Đang thực hiện / Chỉnh sửa':[], 'Trình duyệt KCS / TT':[], 'Hoàn thành':[] };
 
@@ -586,17 +618,23 @@ function veKanban() {
   });
 
   Object.keys(cols).forEach(tt => {
+    const filteredList = cols[tt].filter(v => {
+        const matchHM = !kFilter.hangmuc || v.hangmuc === kFilter.hangmuc;
+        const matchNg = !kFilter.nguoi || v.nguoi.split(',').map(s=>s.trim()).includes(kFilter.nguoi);
+        return matchHM && matchNg;
+    });
+
     const listDiv = document.querySelector(`.kanban-col[data-cot="${tt}"] .k-list`);
+    const countSpan = document.querySelector(`.kanban-col[data-cot="${tt}"] .k-head span`);
+    if (countSpan) countSpan.textContent = `(${filteredList.length})`;
+
     if(listDiv) {
-      listDiv.innerHTML = cols[tt].map(v => {
-        // Xử lý bộ lọc
-        const matchFilter = !kanbanFilter || v.hangmuc === kanbanFilter || v.nguoi.includes(kanbanFilter);
-        
+      listDiv.innerHTML = filteredList.map(v => {
         return `
-        <div class="k-card" ${matchFilter ? '' : 'hidden'} draggable="true" ondragstart="batDauKeo(event, '${thoatHTML(v.nhiemvu)}')">
+        <div class="k-card" draggable="true" ondragstart="batDauKeo(event, '${thoatHTML(v.nhiemvu)}')">
           <div class="k-card-top">
             ${v.hangmuc ? `<span class="k-badge">${thoatHTML(v.hangmuc)}</span>` : `<span></span>`}
-            <button class="k-btn-edit" onclick="suaNhiemVu(event, '${thoatHTML(v.nhiemvu)}')">✎ Edit</button>
+            <button class="k-btn-edit" onclick="suaNhiemVu(event, '${thoatHTML(v.nhiemvu)}')">✎ Sửa</button>
           </div>
           <div class="k-card-title">${thoatHTML(v.nhiemvu)}</div>
           ${v.ghichu ? `<div style="font-size:11.5px; color:var(--concrete); margin-bottom:8px; border-left:2px solid var(--line); padding-left:6px;"><i>${thoatHTML(v.ghichu)}</i></div>` : ''}
@@ -628,7 +666,7 @@ async function thaThe(e, trangThaiMoi) {
   const trangThaiCu = nv.trangthai;
   nv.trangthai = trangThaiMoi; 
   veKanban(); 
-  veDanhSach(); // Update thanh tiến độ dự án
+  veDanhSach();
 
   let mk = maXacNhanCache || prompt('Bảo mật: Nhập mã xác nhận của phòng để lưu thay đổi:');
   if(!mk){ nv.trangthai = trangThaiCu; veKanban(); veDanhSach(); return; }
@@ -662,7 +700,7 @@ function suaNhiemVu(e, tenNhiemVu) {
   if(!nv) return;
   
   nhiemvuDangSua = nv.nhiemvu;
-  $('tieuDeFormCV').textContent = '✎ Chỉnh sửa & Cập nhật Công việc';
+  $('tieuDeFormCV').textContent = '✎ Chỉnh sửa Công việc';
   $('guiViec').textContent = 'Lưu cập nhật';
   
   $('cv-mada').value = nv.mada;
@@ -670,7 +708,11 @@ function suaNhiemVu(e, tenNhiemVu) {
   $('cv-nhiemvu').value = nv.nhiemvu;
   setMultiSelect('cv-nguoi', nv.nguoi);
   $('cv-uutien').value = nv.uutien;
-  $('cv-han').value = nv.han === '-' ? '' : nv.han;
+  
+  // Nạp lại ngày cho Flatpickr
+  const dateInput = document.querySelector("#cv-han")._flatpickr;
+  if(dateInput) dateInput.setDate(nv.han === '-' ? '' : nv.han, false, "d/m/Y");
+
   $('cv-trangthai').value = nv.trangthai;
   $('cv-ghichu').value = nv.ghichu || '';
   $('cv-matkhau').value = maXacNhanCache;
@@ -679,11 +721,15 @@ function suaNhiemVu(e, tenNhiemVu) {
 }
 
 $('btnGiaoViecKanban').addEventListener('click', () => {
-  nhiemvuDangSua = null; // Cờ tạo mới
+  nhiemvuDangSua = null; 
   $('tieuDeFormCV').textContent = '🗒 Khai báo công việc';
   $('guiViec').textContent = 'Ghi vào Sheets';
   $('cv-mada').value = madaKanbanHienTai;
-  ['cv-hangmuc','cv-nhiemvu','cv-han','cv-ghichu'].forEach(id=>$(id).value='');
+  ['cv-hangmuc','cv-nhiemvu','cv-ghichu'].forEach(id=>$(id).value='');
+  
+  const dateInput = document.querySelector("#cv-han")._flatpickr;
+  if(dateInput) dateInput.clear();
+  
   setMultiSelect('cv-nguoi', '');
   $('cv-matkhau').value = maXacNhanCache;
   $('msgViec').textContent = '';
@@ -704,7 +750,8 @@ $('nutThemDuAn').addEventListener('click', ()=>{
   $('tieuDeFormDA').textContent = '➕ Thêm dự án mới';
   $('guiDuAn').textContent = 'Ghi vào Sheets';
   $('xoaDuAn').hidden = true;
-  ['da-ma','da-ten','da-loai','da-giaidoan','da-vaitro','da-hannop','da-link'].forEach(id=>$(id).value='');
+  ['da-ma','da-ten','da-loai','da-giaidoan','da-vaitro','da-link'].forEach(id=>$(id).value='');
+  const d1 = document.querySelector("#da-hannop")._flatpickr; if(d1) d1.clear();
   setMultiSelect('da-phutrach', '');
   $('da-matkhau').value = maXacNhanCache;
   $('msgDuAn').textContent = '';
@@ -715,7 +762,8 @@ $('nutThemViec').addEventListener('click', ()=>{
   nhiemvuDangSua = null;
   $('tieuDeFormCV').textContent = '🗒 Khai báo công việc';
   $('guiViec').textContent = 'Ghi vào Sheets';
-  ['cv-mada','cv-hangmuc','cv-nhiemvu','cv-han','cv-ghichu'].forEach(id=>$(id).value='');
+  ['cv-mada','cv-hangmuc','cv-nhiemvu','cv-ghichu'].forEach(id=>$(id).value='');
+  const d2 = document.querySelector("#cv-han")._flatpickr; if(d2) d2.clear();
   setMultiSelect('cv-nguoi', '');
   $('cv-matkhau').value = maXacNhanCache;
   $('msgViec').textContent = '';
@@ -727,7 +775,7 @@ $('luoiDuAn').addEventListener('click', e => {
   if(nutKanban){
     madaKanbanHienTai = nutKanban.dataset.mokanban;
     $('kanbanTitle').textContent = 'BẢNG CÔNG VIỆC: ' + madaKanbanHienTai;
-    kanbanFilter = null; // Xóa bộ lọc khi mở lại
+    kFilter = { hangmuc: null, nguoi: null }; // Reset bộ lọc
     veKanban();
     $('modalKanban').hidden = false;
     return;
@@ -749,7 +797,10 @@ $('luoiDuAn').addEventListener('click', e => {
     $('da-vaitro').value = d.vaitro;
     setMultiSelect('da-phutrach', d.phutrach);
     $('da-trangthai').value = d.trangthai || 'Đang triển khai';
-    $('da-hannop').value = d.hannop === '-' ? '' : d.hannop;
+    
+    const d1 = document.querySelector("#da-hannop")._flatpickr;
+    if(d1) d1.setDate(d.hannop === '-' ? '' : d.hannop, false, "d/m/Y");
+
     $('da-link').value = d.link === '-' || d.link === '#' ? '' : d.link;
     $('da-matkhau').value = maXacNhanCache;
     $('msgDuAn').textContent = '';
@@ -788,7 +839,7 @@ $('guiDuAn').addEventListener('click', async ()=>{
   }
   const duLieu = {
     magoc: maDangSua || '', ma:v('da-ma'), ten:v('da-ten'), loai:v('da-loai'), giaidoan:v('da-giaidoan'),
-    vaitro:v('da-vaitro'), tiendo: tinhTienDo(maDangSua || v('da-ma')), // Gửi tiến độ tính tự động
+    vaitro:v('da-vaitro'), tiendo: tinhTienDo(maDangSua || v('da-ma')), 
     phutrach:v('da-phutrach'), trangthai:v('da-trangthai'), hannop:v('da-hannop')||'-', link:v('da-link')||'-'
   };
   const ok = await guiLenSheets(maDangSua ? 'suaduan' : 'duan', duLieu, v('da-matkhau'), msg, $('guiDuAn'));
@@ -842,7 +893,6 @@ $('guiViec').addEventListener('click', async ()=>{
     uutien:v('cv-uutien'), han:v('cv-han')||'-', trangthai:v('cv-trangthai'), ghichu:v('cv-ghichu')
   };
   
-  // Xác định đang là tạo mới hay edit (cần gửi biến magoc và nvgoc để backend biết đường tìm)
   if (nhiemvuDangSua) {
     duLieuViec.magoc = madaKanbanHienTai;
     duLieuViec.nvgoc = nhiemvuDangSua;
@@ -853,7 +903,6 @@ $('guiViec').addEventListener('click', async ()=>{
   if(ok){
     maXacNhanCache = v('cv-matkhau'); lanGhiCuoi = Date.now();
     
-    // Cập nhật mảng local
     if(nhiemvuDangSua) {
       const idx = NHIEM_VU.findIndex(x => x.mada === madaKanbanHienTai && x.nhiemvu === nhiemvuDangSua);
       if(idx > -1) NHIEM_VU[idx] = {...duLieuViec};
@@ -869,7 +918,10 @@ $('guiViec').addEventListener('click', async ()=>{
 });
 
 /* ====== KHỞI TẠO VÀ SỰ KIỆN ====== */
-['oTimKiem','locLoai','locGiaiDoan','locTrangThai','sapXep'].forEach(id=>$(id).addEventListener('change', veDanhSach));
+
+/* Fix chức năng tìm kiếm thời gian thực */
+$('oTimKiem').addEventListener('input', veDanhSach);
+['locLoai','locGiaiDoan','locTrangThai','sapXep'].forEach(id=>$(id).addEventListener('change', veDanhSach));
 $('nutLamMoi').addEventListener('click', taiDuLieu);
 
 document.querySelectorAll('[data-dong]').forEach(b=>b.addEventListener('click', e=>e.target.closest('.modal-overlay').hidden = true));
@@ -888,6 +940,26 @@ document.addEventListener('click', e => {
 /* Khởi tạo Multi-select */
 taoMultiSelect('ms-phutrach-container', 'da-phutrach');
 taoMultiSelect('ms-nguoi-container', 'cv-nguoi');
+
+/* Khởi tạo Flatpickr (Lịch thả xuống) */
+const fpConfig = {
+  locale: "vn",
+  dateFormat: "d/m/Y",
+  allowInput: true,
+  onReady: function(dObj, dStr, fp, dayElem) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "flatpickr-today-btn";
+    btn.textContent = "🎯 Chọn Hôm nay";
+    btn.onclick = function() {
+      fp.setDate(new Date());
+      fp.close();
+    };
+    fp.calendarContainer.appendChild(btn);
+  }
+};
+flatpickr("#da-hannop", fpConfig);
+flatpickr("#cv-han", fpConfig);
 
 /* Dark Mode Trigger */
 const sw = document.querySelector('#checkboxTheme');
