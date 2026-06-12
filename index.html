@@ -154,11 +154,9 @@ const DANH_SACH_NHAN_SU = [
   .context-menu li.danger:hover { background: var(--red); color: var(--white); }
 
   /* ===== BẢNG KANBAN TỐI ƯU CỰC RỘNG ===== */
-  /* Cửa sổ rộng 95vw để chứa nhiều thông tin */
   .modal-kanban{max-width:95vw; width:100%; display:flex;flex-direction:column;height:90vh;max-height:90vh;}
   .kanban-tools {padding: 0 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px dashed var(--line); padding-bottom: 12px; flex-shrink:0;}
   
-  /* Hàng Filter & Sort */
   .k-tools-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .k-filter-lbl {font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--concrete); text-transform: uppercase; letter-spacing: 0.05em; width: 75px; flex-shrink:0;}
   .k-chip {padding: 3px 10px; font-size: 11.5px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); color: var(--concrete); cursor: pointer; transition: 0.2s;}
@@ -170,13 +168,11 @@ const DANH_SACH_NHAN_SU = [
   .kanban-col{flex:1;min-width:280px;background:rgba(0,0,0,0.03);border:1px solid var(--line);border-radius:4px;display:flex;flex-direction:column;padding:8px; max-height:100%;}
   .k-head{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--ink); flex-shrink:0;}
   
-  /* THANH CUỘN ĐỘC LẬP CHO TỪNG CỘT */
   .k-list{flex:1;min-height:50px; overflow-y:auto; overflow-x:hidden; padding-right:4px; padding-bottom:40px;} 
   .k-list::-webkit-scrollbar { width: 4px; }
   .k-list::-webkit-scrollbar-track { background: transparent; }
   .k-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
 
-  /* THẺ CÔNG VIỆC TỐI ƯU CỰC GỌN */
   .k-card{
     background:var(--white);border:1px solid var(--line);border-left:4px solid var(--ink);
     padding:8px 10px;margin-bottom:8px;border-radius:2px;cursor:grab;box-shadow:0 1px 3px rgba(0,0,0,0.05);
@@ -186,15 +182,11 @@ const DANH_SACH_NHAN_SU = [
   .k-card:active{cursor:grabbing;transform:scale(0.98);}
   .k-card.k-dragging{opacity:0.4;background:#f0f0f0;}
   .k-card[hidden]{display: none !important;}
-  
-  /* Trạng thái Chọn nhiều (Multi-select) */
   .k-card.k-selected { border-color: var(--orange); background: #FFF3E0; border-left-color: var(--orange); }
 
   .k-card-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;}
   .k-badge{font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:1px 6px;background:var(--paper);color:var(--concrete);border:1px solid var(--line);border-radius:2px;}
   .k-card-title{font-size:13px;font-weight:600;line-height:1.3;margin-bottom:4px;color:var(--ink);}
-  
-  /* Ép Ghi chú thành 1 dòng (ellipsis) */
   .k-note {font-size:11px; color:var(--concrete); margin-bottom:6px; border-left:2px solid var(--line); padding-left:6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
   .k-card-meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--concrete);display:flex;justify-content:space-between;align-items:center;}
   
@@ -232,7 +224,7 @@ const DANH_SACH_NHAN_SU = [
   [data-theme="dark"] .k-card.k-selected { background: rgba(232, 93, 4, 0.15); }
   [data-theme="dark"] .context-menu { background: #1E1E1E; border-color: #444; }
   [data-theme="dark"] .context-menu li { border-bottom-color: #333; }
-  [data-theme="dark"] .context-menu li:hover { background: #2A2A2A; }
+  [data-theme="dark"] .context-menu li:hover { background: #2A2A2A; color: var(--orange); }
   [data-theme="dark"] .k-sort-select { background: #1E1E1E; border-color: #444; color: #E0E0E0; }
 
   /* Flatpickr Dark Mode Overrides */
@@ -645,7 +637,7 @@ let ctxTaskNames = [];
 document.addEventListener('contextmenu', e => {
   // 1. Menu Task
   const kCard = e.target.closest('.k-card');
-  if(kCard && madaKanbanHienTai) {
+  if(kCard) {
     e.preventDefault(); e.stopPropagation();
     if(!kCard.classList.contains('k-selected')) {
       document.querySelectorAll('.k-card.k-selected').forEach(c => c.classList.remove('k-selected'));
@@ -675,11 +667,33 @@ document.addEventListener('contextmenu', e => {
 });
 
 /* Click ngoài đóng Menu */
-document.addEventListener('click', e => { document.querySelectorAll('.context-menu').forEach(m => m.classList.remove('show')); });
+document.addEventListener('click', e => { 
+  if (!e.target.closest('.context-menu')) {
+    document.querySelectorAll('.context-menu').forEach(m => m.classList.remove('show')); 
+  }
+});
+
+/* Khôi phục Sự kiện Click mở Bảng Kanban cho Dự án */
+$('luoiDuAn').addEventListener('click', e => {
+  const nutKanban = e.target.closest('.btn-kanban');
+  if(nutKanban){
+    madaKanbanHienTai = nutKanban.dataset.mokanban;
+    $('kanbanTitle').textContent = 'BẢNG CÔNG VIỆC: ' + madaKanbanHienTai;
+    kFilter = { hangmuc: null, nguoi: null }; 
+    if($('k-sort-select')) $('k-sort-select').value = 'macdinh';
+    veKanban();
+    $('modalKanban').hidden = false;
+  }
+});
 
 /* Hành động Menu Project */
-$('ctx-p-portal').onclick = () => { const d = DU_AN.find(x => x.ma === ctxProjectMa); if(d) window.open(d.link, '_blank'); };
+$('ctx-p-portal').onclick = () => { 
+  $('projectContextMenu').classList.remove('show');
+  const d = DU_AN.find(x => x.ma === ctxProjectMa); 
+  if(d) window.open(d.link, '_blank'); 
+};
 $('ctx-p-edit').onclick = () => {
+  $('projectContextMenu').classList.remove('show');
   const d = DU_AN.find(x => x.ma === ctxProjectMa); if(!d) return;
   maDangSua = d.ma;
   $('tieuDeFormDA').textContent = '✎ Chỉnh sửa: ' + d.ma; $('guiDuAn').textContent = 'Lưu thay đổi';
@@ -690,6 +704,7 @@ $('ctx-p-edit').onclick = () => {
   moModal('modalDuAn');
 };
 $('ctx-p-del').onclick = async () => {
+  $('projectContextMenu').classList.remove('show');
   let mk = maXacNhanCache || prompt('Bảo mật: Nhập mã xác nhận để XÓA dự án:');
   if(!mk) return;
   if(!confirm(`Xóa hẳn dự án "${ctxProjectMa}" khỏi Sheets?\nHành động này không thể hoàn tác!`)) return;
@@ -699,6 +714,7 @@ $('ctx-p-del').onclick = async () => {
 
 /* Hành động Menu Task */
 $('ctx-t-edit').onclick = () => {
+  $('taskContextMenu').classList.remove('show');
   if(!ctxTaskNames.length) return;
   const nv = NHIEM_VU.find(v => v.mada === madaKanbanHienTai && v.nhiemvu === ctxTaskNames[0]); if(!nv) return;
   nhiemvuDangSua = nv.nhiemvu;
@@ -712,6 +728,7 @@ $('ctx-t-edit').onclick = () => {
 
 /* Xóa nhiều công việc cùng lúc */
 $('ctx-t-del').onclick = async () => {
+  $('taskContextMenu').classList.remove('show');
   if(!ctxTaskNames.length) return;
   let mk = maXacNhanCache || prompt(`XÓA ${ctxTaskNames.length} CÔNG VIỆC.\nNhập mã xác nhận của phòng:`);
   if(!mk) return;
@@ -721,7 +738,7 @@ $('ctx-t-del').onclick = async () => {
   try {
     let promises = ctxTaskNames.map(nv => {
       NHIEM_VU = NHIEM_VU.filter(x => !(x.mada === madaKanbanHienTai && x.nhiemvu === nv)); // Xóa local
-      // Gửi type 'xoanhiemvu' về Backend (LƯU Ý: Phải code thêm ở file Apps Script)
+      // Gửi type 'xoanhiemvu' về Backend
       return fetch(LINK_APPS_SCRIPT, { method:'POST', body: JSON.stringify({ type:'xoanhiemvu', matkhau: mk, data:{ mada: madaKanbanHienTai, nhiemvu: nv }}) });
     });
     await Promise.all(promises);
