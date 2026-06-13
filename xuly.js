@@ -711,29 +711,3 @@ try{
 
 taiDuLieu();
 setInterval(()=>{ if(Date.now() - lanGhiCuoi > 6*60*1000) taiDuLieu(); }, 5*60*1000);
-
-/* ====== Sân chơi 7 người que (trang trí) ====== */
-(function taoNguoiQue(){
-  const san = document.getElementById('sanChoi');
-  if(!san) return;
-  const mau = ['#E85D04','#1D4ED8','#1E6B33','#B45309','#9A3B00','#6B7280','#B91C1C'];
-  /* lấy tên cuối cho gọn: "Phạm Anh Khoa" -> "Khoa" */
-  const ten = (DANH_SACH_NHAN_SU || []).slice(0, 7).map(t => {
-    const p = String(t).trim().split(/\s+/); return p[p.length - 1] || t;
-  });
-  while(ten.length < 7) ten.push('Bạn ' + (ten.length + 1));
-
-  const nguoiQueSVG = c => `
-    <svg viewBox="0 0 26 46">
-      <circle cx="13" cy="8" r="6" fill="none" stroke="${c}" stroke-width="2.5"/>
-      <line x1="13" y1="14" x2="13" y2="30" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>
-      <g class="tay-t"><line x1="0" y1="0" x2="-7" y2="9" transform="translate(13 18)" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/></g>
-      <g class="tay-p"><line x1="0" y1="0" x2="7" y2="9" transform="translate(13 18)" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/></g>
-      <g class="chan-t"><line x1="0" y1="0" x2="-7" y2="14" transform="translate(13 30)" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/></g>
-      <g class="chan-p"><line x1="0" y1="0" x2="7" y2="14" transform="translate(13 30)" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/></g>
-    </svg>`;
-
-  san.innerHTML = ten.map((t, i) =>
-    `<div class="nq nq${i+1}"><span class="ten">${thoatHTML(t)}</span>${nguoiQueSVG(mau[i])}</div>`
-  ).join('');
-})();
