@@ -738,7 +738,6 @@ function doiView(v){
   $('luoiDuAn').style.display      = v==='duan' ? '' : 'none';
   $('thongBaoTrong').style.display = v==='duan' ? '' : 'none';
   $('thanhCongCu').style.display   = v==='duan' ? '' : 'none';
-  $('daiSoLieu').style.display     = v==='duan' ? '' : 'none';
   $('viewTongHop').hidden = v!=='tonghop';
   $('viewToi').hidden     = v!=='toi';
   veViewPhu();

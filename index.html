@@ -18,8 +18,8 @@
 <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@3.0.0-beta.0/scroll-behaviour.min.js"></script>
 
 <!-- ===== 3 FILE CUA HE THONG ===== -->
-<link rel="stylesheet" href="giaodien.css">
-<script src="cauhinh.js"></script>
+<link rel="stylesheet" href="giaodien.css?v=3">
+<script src="cauhinh.js?v=3"></script>
 </head>
 
 <div id="toast"></div>
@@ -45,6 +45,13 @@
       <span class="donvi" id="tenDonVi"></span>
       <h1>Trung tâm quản lý dự án</h1>
     </div>
+    <div class="hd-stats" id="daiSoLieu" hidden>
+      <span class="hs"><b id="stTong">—</b><span>dự án</span></span>
+      <span class="hs"><b id="stTrienKhai">—</b><span>đang triển khai</span></span>
+      <span class="hs"><b id="stTamNgung">—</b><span>tạm ngưng</span></span>
+      <span class="hs"><b id="stTienDo">—</b><span>tiến độ TB</span></span>
+      <span class="hs warn"><b id="stSapHan">—</b><span>sắp đến hạn</span></span>
+    </div>
     <div class="hd-sync">
       <div class="theme-switch-wrapper">
         <span class="theme-icon">☀️</span>
@@ -59,32 +66,24 @@
       <button class="btn-refresh" id="nutLamMoi" type="button">⟳ Cập nhật dữ liệu</button>
     </div>
   </div>
-
-  <div class="stats" id="daiSoLieu" hidden>
-    <div class="stat"><span class="lbl">Tổng dự án</span><span class="num" id="stTong">—</span></div>
-    <div class="stat"><span class="lbl">Đang triển khai</span><span class="num" id="stTrienKhai">—</span></div>
-    <div class="stat"><span class="lbl">Đang tạm ngưng</span><span class="num" id="stTamNgung">—</span></div>
-    <div class="stat"><span class="lbl">Tiến độ trung bình</span><span class="num" id="stTienDo">—</span></div>
-    <div class="stat"><span class="lbl">Sắp đến hạn (≤15 ngày)</span><span class="num warn" id="stSapHan">—</span></div>
-  </div>
-
-  <div class="toolbar" id="thanhCongCu" hidden>
-    <input type="search" id="oTimKiem" placeholder="🔍 Tìm theo tên, mã dự án, người phụ trách..." autocomplete="off" aria-label="Tìm kiếm">
-    <select id="locLoai" aria-label="Lọc theo loại"><option value="">Tất cả loại</option></select>
-    <select id="locGiaiDoan" aria-label="Lọc theo giai đoạn"><option value="">Tất cả giai đoạn</option></select>
-    <select id="locTrangThai" aria-label="Lọc theo trạng thái"><option value="">Tất cả trạng thái</option></select>
-    <select id="sapXep" aria-label="Sắp xếp">
-      <option value="han">Sắp xếp: Hạn nộp gần nhất</option>
-      <option value="tiendo-asc">Sắp xếp: Tiến độ thấp → cao</option>
-      <option value="tiendo-desc">Sắp xếp: Tiến độ cao → thấp</option>
-    </select>
-  </div>
 </header>
 
 <div class="view-tabs">
-  <button class="view-tab active" type="button" data-view="duan"><i class="vt-i">▦</i> Dự án</button>
-  <button class="view-tab" type="button" data-view="tonghop"><i class="vt-i">⊞</i> Bảng tổng hợp</button>
-  <button class="view-tab" type="button" data-view="toi"><i class="vt-i">☑</i> Việc của tôi</button>
+  <button class="view-tab active" type="button" data-view="duan">Dự án</button>
+  <button class="view-tab" type="button" data-view="tonghop">Bảng tổng hợp</button>
+  <button class="view-tab" type="button" data-view="toi">Việc của tôi</button>
+</div>
+
+<div class="toolbar" id="thanhCongCu" hidden>
+  <input type="search" id="oTimKiem" placeholder="🔍 Tìm theo tên, mã dự án, người phụ trách..." autocomplete="off" aria-label="Tìm kiếm">
+  <select id="locLoai" aria-label="Lọc theo loại"><option value="">Tất cả loại</option></select>
+  <select id="locGiaiDoan" aria-label="Lọc theo giai đoạn"><option value="">Tất cả giai đoạn</option></select>
+  <select id="locTrangThai" aria-label="Lọc theo trạng thái"><option value="">Tất cả trạng thái</option></select>
+  <select id="sapXep" aria-label="Sắp xếp">
+    <option value="han">Sắp xếp: Hạn nộp gần nhất</option>
+    <option value="tiendo-asc">Sắp xếp: Tiến độ thấp → cao</option>
+    <option value="tiendo-desc">Sắp xếp: Tiến độ cao → thấp</option>
+  </select>
 </div>
 
 <div id="khuNoiDung">
@@ -220,6 +219,6 @@
   <span>Nguồn dữ liệu: Google Sheets · Tự làm mới mỗi 5 phút</span>
 </footer>
 
-<script src="xuly.js"></script>
+<script src="xuly.js?v=3"></script>
 </body>
 </html>
