@@ -310,3 +310,8 @@
   .toi-viec.co-vm{border-left:3px solid var(--red)}
   .th-vm{color:var(--red);margin-right:4px;cursor:help}
   .th-leaf.co-vm .th-ten{color:var(--red)}
+
+  /* ----- Ô tick & badge "Mới" ----- */
+  .tb-check{display:flex;align-items:center;gap:5px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--ink);cursor:pointer;white-space:nowrap}
+  .tb-check input{cursor:pointer}
+  .badge-moi{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#fff;background:var(--orange);padding:1px 6px;border-radius:8px;margin-right:6px;vertical-align:middle;letter-spacing:.02em}

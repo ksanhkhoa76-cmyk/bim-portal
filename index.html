@@ -18,8 +18,8 @@
 <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@3.0.0-beta.0/scroll-behaviour.min.js"></script>
 
 <!-- ===== 3 FILE CUA HE THONG ===== -->
-<link rel="stylesheet" href="giaodien.css?v=8">
-<script src="cauhinh.js?v=8"></script>
+<link rel="stylesheet" href="giaodien.css?v=9">
+<script src="cauhinh.js?v=9"></script>
 </head>
 
 <div id="toast"></div>
@@ -39,16 +39,6 @@
   </ul>
 </div>
 
-<div id="toiContextMenu" class="context-menu">
-  <ul>
-    <li id="ctx-toi-edit">✎ Cập nhật thông tin</li>
-    <li class="ctx-divider"></li>
-    <li class="ctx-tt" data-tt="Chưa bắt đầu">○ Chưa bắt đầu</li>
-    <li class="ctx-tt" data-tt="Đang thực hiện / Chỉnh sửa">◐ Đang thực hiện</li>
-    <li class="ctx-tt" data-tt="Trình duyệt KCS / TT">◑ Trình duyệt KCS/TT</li>
-    <li class="ctx-tt" data-tt="Hoàn thành">● Hoàn thành</li>
-  </ul>
-</div>
 
 <header>
   <div class="hd-top">
@@ -118,6 +108,7 @@
     <select id="thNguoi"><option value="">Tất cả nhân sự</option></select>
     <button id="thMoTatCa" type="button" class="th-nut">Mở tất cả</button>
     <button id="thGapTatCa" type="button" class="th-nut">Gập tất cả</button>
+    <label class="tb-check"><input type="checkbox" id="thAnXong"> Ẩn việc đã xong</label>
   </div>
   <div class="th-head">
     <span class="th-ten">Hạng mục / công việc</span>
@@ -140,6 +131,7 @@
     </select>
     <button id="toiMoTatCa" type="button" class="th-nut" hidden>Mở tất cả</button>
     <button id="toiGapTatCa" type="button" class="th-nut" hidden>Gập tất cả</button>
+    <label class="tb-check"><input type="checkbox" id="toiAnXong"> Ẩn việc đã xong</label>
     <span class="tb-spacer"></span>
     <div class="tb-sort"><span class="tb-sort-lbl">Sắp xếp</span>
       <select id="toiSapXep" title="Sắp xếp dự án">
@@ -245,7 +237,7 @@
         </select></div>
       <div class="f-group f-full"><label>Ghi chú / Cập nhật</label><input id="cv-ghichu" placeholder="Cập nhật tình hình..." autocomplete="off"></div>
       <div class="f-group f-full"><label>⚠ Vướng mắc (để trống nếu không có)</label><input id="cv-vuongmac" placeholder="VD: Chờ số liệu khảo sát từ tổ Trắc địa..." autocomplete="off"></div>
-      <div class="f-group f-full"><label>Mã xác nhận của phòng *</label><input id="cv-matkhau" type="password" autocomplete="new-password"></div>
+      <div class="f-group f-full"><label>Mã xác nhận của phòng *</label><input id="cv-matkhau" type="password" autocomplete="new-password"><label class="tb-check" style="margin-top:6px"><input type="checkbox" id="cv-nhoma"> Nhớ mã trên máy này (không dùng máy chung)</label></div>
     </div>
     <div class="modal-foot">
       <span class="modal-msg" id="msgViec"></span>
@@ -259,6 +251,6 @@
   <span>Nguồn dữ liệu: Google Sheets · Tự làm mới mỗi 5 phút</span>
 </footer>
 
-<script src="xuly.js?v=8"></script>
+<script src="xuly.js?v=9"></script>
 </body>
 </html>
