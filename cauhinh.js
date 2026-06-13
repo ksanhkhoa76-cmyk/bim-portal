@@ -16,5 +16,5 @@ const TEN_DON_VI = "Phòng BIM — KC1";
 /* Danh sách nhân sự (dùng cho ô chọn người ở form). Thêm tên vào giữa 2 dấu " */
 const DANH_SACH_NHAN_SU = [
   "Phạm Anh Khoa", "Huỳnh Minh Đức", "Hồ Công Bảo",
-  "Nguyễn Minh Phúc", "Nguyễn Thành Cang", "Trần Khắc Trường", "Phan Gia Bảo"
+  "Vũ Minh Phúc", "Nguyễn Thành Cang", "Trần Khắc Trường", "Phan Gia Bảo"
 ];
