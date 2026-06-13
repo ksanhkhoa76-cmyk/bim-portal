@@ -384,6 +384,12 @@ async function thaThe(trangThaiMoi){
 
 /* ====== Menu chuột phải ====== */
 document.addEventListener('contextmenu', e=>{
+  const ttEl = e.target.closest('[data-ttpick]');
+  if(ttEl){
+    e.preventDefault(); e.stopPropagation();
+    moMenuTrangThai(Number(ttEl.dataset.ttpick), e.clientX, e.clientY);
+    return;
+  }
   const kCard = e.target.closest('.k-card');
   if(kCard){
     e.preventDefault(); e.stopPropagation();
