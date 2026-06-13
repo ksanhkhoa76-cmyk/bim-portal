@@ -12,6 +12,7 @@ const LINK_CSV_NHIEMVU = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTmId
 const LINK_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyUcTHBeIsUGGitZUkRxpl3NEcwNzK0nSqgUD4Rg2__IB1q8m9KBVHImZrbY0UFrKRxgA/exec";
 
 const TEN_DON_VI = "Phòng BIM — KC1";
+const TRUONG_NHOM = "Phạm Anh Khoa";   /* Leader KC1 */
 
 /* Danh sách nhân sự (dùng cho ô chọn người ở form). Thêm tên vào giữa 2 dấu " */
 const DANH_SACH_NHAN_SU = [
