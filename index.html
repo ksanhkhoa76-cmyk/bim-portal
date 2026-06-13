@@ -18,8 +18,8 @@
 <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@3.0.0-beta.0/scroll-behaviour.min.js"></script>
 
 <!-- ===== 3 FILE CUA HE THONG ===== -->
-<link rel="stylesheet" href="giaodien.css?v=9">
-<script src="cauhinh.js?v=9"></script>
+<link rel="stylesheet" href="giaodien.css?v=10">
+<script src="cauhinh.js?v=10"></script>
 </head>
 
 <div id="toast"></div>
@@ -29,6 +29,15 @@
     <li id="ctx-p-portal">🔗 Mở Portal dự án</li>
     <li id="ctx-p-edit">✎ Chỉnh sửa dự án</li>
     <li id="ctx-p-del" class="danger">🗑 Xóa dự án này</li>
+  </ul>
+</div>
+
+<div id="menuTrangThai" class="context-menu">
+  <ul>
+    <li class="mtt" data-tt="Chưa bắt đầu">○ Chưa bắt đầu</li>
+    <li class="mtt" data-tt="Đang thực hiện / Chỉnh sửa">◐ Đang thực hiện</li>
+    <li class="mtt" data-tt="Trình duyệt KCS / TT">◑ Trình duyệt KCS/TT</li>
+    <li class="mtt" data-tt="Hoàn thành">● Hoàn thành</li>
   </ul>
 </div>
 
@@ -47,11 +56,11 @@
       <h1>Trung tâm quản lý dự án</h1>
     </div>
     <div class="hd-stats" id="daiSoLieu" hidden>
-      <span class="hs"><b id="stTong">—</b><span>dự án</span></span>
-      <span class="hs"><b id="stTrienKhai">—</b><span>đang triển khai</span></span>
-      <span class="hs"><b id="stTamNgung">—</b><span>tạm ngưng</span></span>
-      <span class="hs"><b id="stTienDo">—</b><span>tiến độ TB</span></span>
-      <span class="hs warn"><b id="stSapHan">—</b><span>sắp đến hạn</span></span>
+      <span class="hs"><span>Tổng dự án</span><b id="stTong">—</b></span>
+      <span class="hs"><span>Đang triển khai</span><b id="stTrienKhai">—</b></span>
+      <span class="hs"><span>Tạm ngưng</span><b id="stTamNgung">—</b></span>
+      <span class="hs"><span>Tiến độ trung bình</span><b id="stTienDo">—</b></span>
+      <span class="hs warn"><span>Sắp đến hạn</span><b id="stSapHan">—</b></span>
     </div>
     <div class="hd-sync">
       <div class="theme-switch-wrapper">
@@ -226,7 +235,7 @@
       <div class="f-group f-full"><label>Nội dung công việc (không bắt buộc)</label><input id="cv-nhiemvu" placeholder="Ghi chú thêm nếu cần — có thể để trống" autocomplete="off"></div>
       <div class="f-group f-full"><label>Người thực hiện *</label><div class="ms-wrapper" id="ms-nguoi-container"></div></div>
       <div class="f-group"><label>Ưu tiên</label>
-        <select id="cv-uutien"><option>Trung bình</option><option>Cao</option><option>Thấp</option></select></div>
+        <select id="cv-uutien"><option>Thấp</option><option selected>Trung bình</option><option>Cao</option></select></div>
       <div class="f-group"><label>Hạn nộp</label><input id="cv-han" placeholder="dd/mm/yyyy" autocomplete="off"></div>
       <div class="f-group f-full"><label>Trạng thái</label>
         <select id="cv-trangthai">
@@ -237,7 +246,7 @@
         </select></div>
       <div class="f-group f-full"><label>Ghi chú / Cập nhật</label><input id="cv-ghichu" placeholder="Cập nhật tình hình..." autocomplete="off"></div>
       <div class="f-group f-full"><label>⚠ Vướng mắc (để trống nếu không có)</label><input id="cv-vuongmac" placeholder="VD: Chờ số liệu khảo sát từ tổ Trắc địa..." autocomplete="off"></div>
-      <div class="f-group f-full"><label>Mã xác nhận của phòng *</label><input id="cv-matkhau" type="password" autocomplete="new-password"><label class="tb-check" style="margin-top:6px"><input type="checkbox" id="cv-nhoma"> Nhớ mã trên máy này (không dùng máy chung)</label></div>
+      <div class="f-group f-full"><label>Mã xác nhận của phòng *</label><input id="cv-matkhau" type="password" autocomplete="new-password"><span class="f-hint">Nhập 1 lần, hệ thống nhớ trong phiên làm việc (tự xóa sau 30 phút không dùng hoặc khi tải lại trang).</span></div>
     </div>
     <div class="modal-foot">
       <span class="modal-msg" id="msgViec"></span>
@@ -251,6 +260,6 @@
   <span>Nguồn dữ liệu: Google Sheets · Tự làm mới mỗi 5 phút</span>
 </footer>
 
-<script src="xuly.js?v=9"></script>
+<script src="xuly.js?v=10"></script>
 </body>
 </html>
