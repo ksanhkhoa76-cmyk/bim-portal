@@ -96,7 +96,8 @@ function chuanHoaViec(row){
     uutien: o['uu tien'] || o['uutien'] || '',
     han: o['han'] || o['han nop'] || o['deadline'] || '',
     trangthai: o['trang thai'] || 'Chưa bắt đầu',
-    ghichu: o['ghi chu'] || o['ghichu'] || ''
+    ghichu: o['ghi chu'] || o['ghichu'] || '',
+    vuongmac: o['vuong mac'] || o['vuongmac'] || o['vuong mac / kho khan'] || ''
   };
 }
 
@@ -127,6 +128,10 @@ async function taiDuLieu(){
     dungBoLoc(); veDanhSach();
     if(!$('modalKanban').hidden) veKanban();
     veViewPhu();
+    if(!taiDuLieu._daTuChuyen){
+      taiDuLieu._daTuChuyen = true;
+      if(nguoiCuaToi) doiView('toi');   /* thành viên: vào thẳng việc của mình */
+    }
   }catch(err){
     $('khuNoiDung').innerHTML = '<div class="notice"><h2>⚠ Không tải được dữ liệu</h2><p>Chi tiết: <code>' + thoatHTML(err.message) + '</code></p><p>Kiểm tra link CSV / tên cột hàng 1, rồi bấm ⟳ thử lại.</p></div>';
   }
@@ -468,6 +473,7 @@ function moFormSuaViec(uid){
   if(fp) fp.setDate(nv.han === '-' ? '' : nv.han, false, 'd/m/Y'); else $('cv-han').value = nv.han === '-' ? '' : nv.han;
   $('cv-trangthai').value = chuanCot(nv.trangthai);
   $('cv-ghichu').value = nv.ghichu || '';
+  $('cv-vuongmac').value = nv.vuongmac || '';
   $('cv-matkhau').value = maXacNhanCache;
   $('msgViec').textContent = '';
   moOverlay('modalViec');
@@ -609,7 +615,7 @@ $('btnGiaoViecKanban').addEventListener('click', ()=>{
   $('tieuDeFormCV').textContent = '🗒 Khai báo công việc';
   $('guiViec').textContent = 'Ghi vào Sheets';
   $('cv-mada').value = madaKanbanHienTai || '';
-  ['cv-phancap','cv-nhiemvu','cv-ghichu'].forEach(id=>$(id).value='');
+  ['cv-phancap','cv-nhiemvu','cv-ghichu','cv-vuongmac'].forEach(id=>$(id).value='');
   $('cv-uutien').value = 'Trung bình';
   $('cv-trangthai').value = 'Chưa bắt đầu';
   const fp = document.querySelector('#cv-han')._flatpickr; if(fp) fp.clear(); else $('cv-han').value = '';
@@ -663,7 +669,7 @@ $('guiViec').addEventListener('click', async ()=>{
   const nvGoc = uidDangSua ? NHIEM_VU.find(x => x.uid === uidDangSua) : null;
   const duLieuViec = {
     mada:v('cv-mada'), phancap:v('cv-phancap'), hangmuc:(nvGoc?(nvGoc.hangmuc||''):''), nhiemvu:v('cv-nhiemvu'), nguoi:v('cv-nguoi'),
-    uutien:v('cv-uutien'), han:v('cv-han')||'-', trangthai:v('cv-trangthai'), ghichu:v('cv-ghichu')
+    uutien:v('cv-uutien'), han:v('cv-han')||'-', trangthai:v('cv-trangthai'), ghichu:v('cv-ghichu'), vuongmac:v('cv-vuongmac')
   };
   if(nvGoc){
     duLieuViec.magoc = nvGoc.mada;
@@ -682,7 +688,7 @@ $('guiViec').addEventListener('click', async ()=>{
     } else {
       NHIEM_VU.push({ uid: ++demUid, ...duLieuViec });
       msg.textContent = '✔ Đã giao việc!';
-      ['cv-phancap','cv-nhiemvu','cv-ghichu'].forEach(id=>$(id).value='');
+      ['cv-phancap','cv-nhiemvu','cv-ghichu','cv-vuongmac'].forEach(id=>$(id).value='');
       const fp = document.querySelector('#cv-han')._flatpickr; if(fp) fp.clear();
       setMultiSelect('cv-nguoi', '');
     }
@@ -822,8 +828,9 @@ function veTongHop(){
     const p = pctTrangThai(v.trangthai);
     const pad = 10 + depth*18;
     const ghichu = (v.nhiemvu && v.nhiemvu!==ten) ? '<span class="th-note">'+thoatHTML(v.nhiemvu)+'</span>' : '';
-    return '<div class="th-row th-leaf" data-cbuid="'+v.uid+'">'
-      + '<span class="th-ten" style="padding-left:'+pad+'px"><span class="th-ico"></span>'+thoatHTML(ten)+ghichu+'</span>'
+    const vm = v.vuongmac ? '<span class="th-vm" title="'+thoatHTML(v.vuongmac)+'">⚠</span>' : '';
+    return '<div class="th-row th-leaf'+(v.vuongmac?' co-vm':'')+'" data-cbuid="'+v.uid+'">'
+      + '<span class="th-ten" style="padding-left:'+pad+'px"><span class="th-ico"></span>'+vm+thoatHTML(ten)+ghichu+'</span>'
       + '<span class="th-c-tt">'+chipTrangThaiNho(v.trangthai)+'</span>'
       + '<span class="th-c-ng">'+thoatHTML(v.nguoi)+'</span>'
       + '<span class="th-c-pct"><span class="th-bar"><span class="th-fill" style="width:'+p+'%;background:'+mauPct(p)+'"></span></span><span class="th-pct" style="color:'+mauPct(p)+'">'+p+'%</span></span></div>';
@@ -1001,25 +1008,59 @@ function veViecCuaToi(){
       })(root, 1);
     });
   } else {
-    /* ----- Chế độ DANH SÁCH ----- */
-    dsMa.forEach(ma=>{
-      const da = DU_AN.find(d=>d.ma===ma);
-      html += '<div class="toi-da">'+thoatHTML(ma)+(da?' — '+thoatHTML(da.ten):'')+'</div>';
-      theoDA[ma].forEach(v=>{
-        const opts = ['Chưa bắt đầu','Đang thực hiện / Chỉnh sửa','Trình duyệt KCS / TT','Hoàn thành']
-          .map(s=>'<option'+(chuanCot(v.trangthai)===s?' selected':'')+'>'+s+'</option>').join('');
-        const capCuoi = tachCap(v.phancap).slice(-1)[0] || '';
-        const tenViec = v.nhiemvu || capCuoi || '(việc chưa đặt tên)';
-        const duong = (v.phancap ? thoatHTML(v.phancap) : '');
-        html += '<div class="toi-viec" data-uid="'+v.uid+'">'
-          + '<div class="toi-noidung">'+(duong?'<span class="toi-path">'+duong+'</span>':'')+'<span class="toi-tenviec">'+thoatHTML(tenViec)+'</span>'
-          + (v.han && v.han!=='-' ? '<span class="toi-han">⏳ '+thoatHTML(v.han)+'</span>':'')+'</div>'
-          + '<select class="toi-tt" data-uid="'+v.uid+'">'+opts+'</select>'
-          + '<button class="toi-sua" type="button" data-suatoi="'+v.uid+'" title="Chỉnh sửa công việc">✎</button></div>';
-      });
+    /* ----- Chế độ DANH SÁCH: gom theo độ khẩn ----- */
+    const nhom = { tre:[], tuan:[], xa:[], xong:[] };
+    viec.forEach(v=>{
+      if(chuanCot(v.trangthai)==='Hoàn thành'){ nhom.xong.push(v); return; }
+      const n = soNgayConLai(docNgay(v.han));
+      if(n!==null && n<0) nhom.tre.push(v);
+      else if(n!==null && n<=7) nhom.tuan.push(v);
+      else nhom.xa.push(v);
     });
+    /* trong mỗi nhóm: trễ nhiều/đến hạn sớm lên đầu, rồi ưu tiên cao */
+    const rankUt = {'Cao':3,'Trung bình':2,'Thấp':1};
+    const sapNhom = arr => arr.sort((a,b)=>{
+      const na=soNgayConLai(docNgay(a.han)), nb=soNgayConLai(docNgay(b.han));
+      const va = na===null?9999:na, vb = nb===null?9999:nb;
+      if(va!==vb) return va-vb;
+      return (rankUt[b.uutien]||2)-(rankUt[a.uutien]||2);
+    });
+    sapNhom(nhom.tre); sapNhom(nhom.tuan); sapNhom(nhom.xa);
+
+    const veNhom = (title, cls, arr, moMacDinh) => {
+      if(!arr.length) return '';
+      const moKey = 'nhom:'+cls;
+      const mo = moMacDinh ? !moNhanhToi.has('dong:'+cls) : moNhanhToi.has(moKey);
+      let h = '<div class="toi-nhom '+cls+'" data-nhom="'+cls+'" data-modef="'+(moMacDinh?1:0)+'">'
+        + '<span>'+(mo?'▾':'▸')+' '+title+'</span><span class="toi-nhom-so">'+arr.length+'</span></div>';
+      if(mo) h += arr.map(v=>dongViecToi(v)).join('');
+      return h;
+    };
+    html += veNhom('🔴 Đã trễ hạn','tre',nhom.tre,true);
+    html += veNhom('🟠 Trong tuần này','tuan',nhom.tuan,true);
+    html += veNhom('⚪ Còn xa / chưa có hạn','xa',nhom.xa,true);
+    html += veNhom('✓ Đã hoàn thành','xong',nhom.xong,false);
   }
   wrap.innerHTML = html;
+}
+/* 1 dòng việc ở "Việc của tôi" — pill chạm để xoay trạng thái + cờ vướng mắc */
+function dongViecToi(v){
+  const capCuoi = tachCap(v.phancap).slice(-1)[0] || '';
+  const tenViec = v.nhiemvu || capCuoi || '(việc chưa đặt tên)';
+  const duong = (v.phancap ? thoatHTML(v.phancap) : '');
+  const c = chuanCot(v.trangthai);
+  let pillTxt='Chưa', pillCol='var(--concrete)';
+  if(c==='Hoàn thành'){ pillTxt='Xong'; pillCol='var(--green)'; }
+  else if(c==='Trình duyệt KCS / TT'){ pillTxt='Duyệt'; pillCol='var(--orange)'; }
+  else if(c==='Đang thực hiện / Chỉnh sửa'){ pillTxt='Đang'; pillCol='var(--amber)'; }
+  const vm = v.vuongmac ? '<div class="toi-vm">⚠ '+thoatHTML(v.vuongmac)+'</div>' : '';
+  const hanTxt = (v.han && v.han!=='-') ? '<span class="toi-han">⏳ '+thoatHTML(v.han)+'</span>' : '';
+  return '<div class="toi-viec'+(v.vuongmac?' co-vm':'')+'" data-uid="'+v.uid+'">'
+    + '<div class="toi-noidung">'+(duong?'<span class="toi-path">'+duong+'</span>':'')
+      + '<span class="toi-tenviec">'+thoatHTML(tenViec)+'</span>'+hanTxt+vm+'</div>'
+    + '<button class="toi-pill" type="button" data-pill="'+v.uid+'" style="color:'+pillCol+';border-color:'+pillCol+'" title="Chạm để đổi trạng thái">'+pillTxt+'</button>'
+    + '<button class="toi-vm-nut'+(v.vuongmac?' on':'')+'" type="button" data-vm="'+v.uid+'" title="Báo/gỡ vướng mắc">⚠</button>'
+    + '<button class="toi-sua" type="button" data-suatoi="'+v.uid+'" title="Sửa chi tiết">✎</button></div>';
 }
 function viecTrong(node){ let a=node.viec.slice(); node.con.forEach(c=>a=a.concat(viecTrong(c))); return a; }
 function dongLaToi(ten, v, depth){
@@ -1053,8 +1094,26 @@ if($('toiMoTatCa')) $('toiMoTatCa').addEventListener('click', ()=>{
   veViecCuaToi();
 });
 if($('toiGapTatCa')) $('toiGapTatCa').addEventListener('click', ()=>{ moNhanhToi.clear(); veViecCuaToi(); });
-/* Bấm ✎ mở form sửa đầy đủ (giống Kanban) + gập/mở cây việc của tôi */
+/* Bấm ✎ / pill / vướng mắc / gập nhóm trong "Việc của tôi" */
 $('toiNoiDung').addEventListener('click', e=>{
+  const pill = e.target.closest('[data-pill]');
+  if(pill){
+    const uid = Number(pill.dataset.pill);
+    const nv = NHIEM_VU.find(v=>v.uid===uid); if(!nv) return;
+    const order = ['Chưa bắt đầu','Đang thực hiện / Chỉnh sửa','Trình duyệt KCS / TT','Hoàn thành'];
+    const next = order[(order.indexOf(chuanCot(nv.trangthai))+1) % order.length];
+    capNhatTrangThaiViec(uid, next);
+    return;
+  }
+  const vmb = e.target.closest('[data-vm]');
+  if(vmb){ datVuongMac(Number(vmb.dataset.vm)); return; }
+  const nhomRow = e.target.closest('.toi-nhom');
+  if(nhomRow){
+    const cls = nhomRow.dataset.nhom, def = nhomRow.dataset.modef==='1';
+    const k = (def?'dong:':'nhom:')+cls;
+    if(moNhanhToi.has(k)) moNhanhToi.delete(k); else moNhanhToi.add(k);
+    veViecCuaToi(); return;
+  }
   const nut = e.target.closest('[data-suatoi]');
   if(nut){ moFormSuaViec(Number(nut.dataset.suatoi)); return; }
   const daRow = e.target.closest('[data-mato]');
@@ -1064,6 +1123,29 @@ $('toiNoiDung').addEventListener('click', e=>{
   const la = e.target.closest('.th-leaf');
   if(la && la.dataset.cbuid){ moFormSuaViec(Number(la.dataset.cbuid)); return; }
 });
+/* Báo / gỡ vướng mắc nhanh (ghi cả việc về Sheets) */
+async function datVuongMac(uid){
+  const nv = NHIEM_VU.find(v=>v.uid===uid); if(!nv) return;
+  const lyDo = prompt('Mô tả vướng mắc (để TRỐNG rồi OK để gỡ cờ):', nv.vuongmac || '');
+  if(lyDo === null) return;              /* bấm Hủy */
+  const moi = lyDo.trim();
+  if(moi === (nv.vuongmac||'')) return;
+  let mk = maXacNhanCache || prompt('Nhập mã xác nhận của phòng để lưu:');
+  if(!mk) return;
+  const cu = nv.vuongmac; nv.vuongmac = moi;
+  try{
+    const res = await fetch(LINK_APPS_SCRIPT, { method:'POST', body: JSON.stringify({
+      type:'suanhiemvu', matkhau: mk, data:{
+        magoc: nv.mada, nvgoc: nv.nhiemvu, nguoigoc: nv.nguoi, phancapgoc: nv.phancap||'',
+        mada: nv.mada, phancap: nv.phancap||'', hangmuc: nv.hangmuc||'', nhiemvu: nv.nhiemvu,
+        nguoi: nv.nguoi, uutien: nv.uutien, han: nv.han||'-', trangthai: chuanCot(nv.trangthai),
+        ghichu: nv.ghichu||'', vuongmac: moi
+      } }) });
+    const kq = await res.json();
+    if(kq.ok){ maXacNhanCache = mk; lanGhiCuoi = Date.now(); baoToast(moi?'⚠ Đã báo vướng mắc':'✔ Đã gỡ vướng mắc','ok'); veViecCuaToi(); veViewPhu(); }
+    else { nv.vuongmac = cu; baoToast('✖ '+(kq.loi||'Lỗi'),'err'); }
+  }catch(err){ nv.vuongmac = cu; baoToast('✖ '+err.message,'err'); }
+}
 /* Cập nhật trạng thái 1 việc về Sheets (dùng cho dropdown + chuột phải) */
 async function capNhatTrangThaiViec(uid, ttMoi){
   const nv = NHIEM_VU.find(v=>v.uid===uid); if(!nv) return false;

@@ -292,3 +292,21 @@
   .ctx-divider{height:1px;background:var(--line);margin:4px 0;padding:0!important;pointer-events:none}
   #toiContextMenu .ctx-tt{font-family:'Be Vietnam Pro',sans-serif;font-size:13px}
   #toiContextMenu .ctx-tt:hover{background:var(--paper)}
+
+  /* ----- "Việc của tôi": nhóm độ khẩn + pill + vướng mắc ----- */
+  .toi-nhom{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 16px;margin-top:2px;cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:15px;letter-spacing:.03em;text-transform:uppercase;border-top:1px solid var(--line)}
+  .toi-nhom.tre{background:rgba(185,28,28,.10);color:var(--red)}
+  .toi-nhom.tuan{background:rgba(180,83,9,.10);color:var(--amber)}
+  .toi-nhom.xa{background:var(--paper);color:var(--concrete)}
+  .toi-nhom.xong{background:var(--paper);color:var(--green)}
+  .toi-nhom-so{font-family:'IBM Plex Mono',monospace;font-size:13px;opacity:.8}
+  .toi-pill{flex-shrink:0;min-width:62px;text-align:center;border:1.5px solid;background:transparent;border-radius:14px;font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.03em;padding:6px 10px;cursor:pointer}
+  .toi-pill:hover{filter:brightness(1.1)}
+  .toi-pill:active{transform:scale(.95)}
+  .toi-vm-nut{flex-shrink:0;border:1px solid var(--line);background:var(--white);color:var(--concrete);font-size:14px;line-height:1;padding:7px 9px;border-radius:2px;cursor:pointer}
+  .toi-vm-nut.on{border-color:var(--red);color:var(--red);background:rgba(185,28,28,.08)}
+  .toi-vm-nut:hover{border-color:var(--red);color:var(--red)}
+  .toi-vm{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-top:3px}
+  .toi-viec.co-vm{border-left:3px solid var(--red)}
+  .th-vm{color:var(--red);margin-right:4px;cursor:help}
+  .th-leaf.co-vm .th-ten{color:var(--red)}
